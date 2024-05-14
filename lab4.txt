@@ -1,0 +1,92 @@
+
+
+Assignment 4
+Aim:
+Design and develop a suitable Student Database application. One of the attributes to me maintained is the attendance of a student in each subject for which he/she has enrolled.
+Using TRIGGERS, we write active rules to do the following:
+
+Whenever attendance is updated, check if the attendance is less than 85%; if so notify the Head of Department concerned.
+Whenever the marks in the Internal Assessment Test are entered, check if the marks are less than 40%; if so, notify the Head of the Department concerned.
+
+Queries & Output :
+
+CREATE DATABASE students; USE students;
+
+CREATE TABLE Student ( student_id INT PRIMARY KEY, student_name VARCHAR(50),
+adm43_marks INT CHECK (adm43_marks >= 0 AND adm43_marks <= 100), adm43_attendance INT CHECK (adm43_attendance >= 0 AND adm43_attendance <= 100)
+);
+
+CREATE TABLE chagnes_table (
+notification_id INT AUTO_INCREMENT PRIMARY KEY, stud_id INT,
+message VARCHAR(255), stud_name VARCHAR(50)
+);
+
+DELIMITER //
+CREATE TRIGGER attend_mark_check AFTER UPDATE ON Student
+FOR EACH ROW BEGIN
+IF NEW.adm43_attendance < 85 THEN
+INSERT INTO chagnes_table (stud_id, message, stud_name)
+VALUES (NEW.student_id , 'Low attendance for student ' , NEW.student_name);
+
+END IF;
+IF NEW.adm43_marks < 40 THEN
+INSERT INTO chagnes_table (stud_id, message, stud_name)
+VALUES (NEW.student_id ,'Low marks for student ' , NEW.student_name ); END IF;
+END;
+// DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER attend_mark_check_inst AFTER INSERT ON Student
+FOR EACH ROW BEGIN
+IF NEW.adm43_attendance < 85 THEN
+INSERT INTO chagnes_table (stud_id, message, stud_name)
+VALUES (NEW.student_id, 'Low attendance for student ' , NEW.student_name); END IF;
+IF NEW.adm43_marks < 40 THEN
+INSERT INTO chagnes_table (stud_id, message, stud_name)
+VALUES (NEW.student_id, 'Low marks for student ' , NEW.student_name ); END IF;
+END;
+// DELIMITER ;
+
+
+
+
+
+
+
+Figure 4.1 shows above queries are successfully executed select * from chagnes_table;
+
+Figure 4.2 null table
+
+INSERT INTO Student (student_id, student_name, adm43_marks, adm43_attendance) VALUES
+(1, 'John Doe', 85, 76),
+(2, 'Jane Smith', 78, 82),
+(3, 'Alice Johnson', 90, 85),
+(4, 'Bob Williams', 82, 79),
+(5, 'Emily Brown', 88, 92),
+(6, 'Michael Davis', 76, 84),
+(7, 'Sophia Wilson', 85, 91),
+(8, 'William Martinez', 92, 88),
+(9, 'Olivia Anderson', 79, 91),
+(10, 'Daniel Taylor', 91, 88); select * from chagnes_table;
+
+Figure 4.3 Table has changes by insertion trigger
+
+
+select * from student;
+
+Figure 4.4 student table
+
+UPDATE students.Student SET adm43_attendance = 75 WHERE student_id = 1;
+
+UPDATE students.Student SET adm43_marks = 25 WHERE student_id = 1;
+
+select * from chagnes_table;
+
+
+Figure 4.5 changes in table as updation happen as compare to fig 4.3 select * from student;
+
+Figure 4.6 changes in student table as updation happen as compare to fig 4.4 and also value updated in table as well as in changes table.
+
+Conclusion:
+In this experiment I learned how to create triggers and also update values in the database with triggers.
+
